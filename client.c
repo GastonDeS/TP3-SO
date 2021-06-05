@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdio.h>
 #define PORT 8080
 #define QCOUNT 12
 
@@ -16,12 +17,24 @@ int main(int argc, char **argv) {
     struct sockaddr_in serv_addr;
     char *hello = "entendido\n";
     char buff[1024];
-    int sock = socket(PF_INET, SOCK_STREAM, IPPROTO_IP);
+    int sock ;
+    if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_IP)) < 0) {
+        printf("\n Socket creation error \n");
+        return -1;
+    }
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
-    inet_pton(AF_INET, "0.0.0.0", &serv_addr.sin_addr);
-    connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+
+    if(inet_pton(AF_INET, "0.0.0.0", &serv_addr.sin_addr)<=0) {
+        printf("\nInvalid address/ Address not supported \n");
+        return -1;
+    }
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+        printf("\nConnection Failed \n");
+        return -1;
+    }
+
     int i;
     for (i=0; i < QCOUNT; i++)
         send(sock , answers[i] , strlen(answers[i]) , 0 );
