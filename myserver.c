@@ -5,25 +5,23 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
-#include <time.h>
 #include <unistd.h>
+#include "random.h"
 
-void checkError(int res, char *function);
-void setupAndInitializeServer(int *serverFd, int *opt, struct sockaddr_in *address, int *addrlen, int *socketFd, FILE **socketFile);
-void runChallenges(FILE *socketFile);
-void clearScreen();
-int isCorrectAns(char const *correctAns,char const *userAns);
-void printHintMessage();
-void printQMessage();
-int randInt(int izq, int der);
-void randomize(void);
-void challenge4();
-void challenge6();
-void challenge7();
-void challenge8();
-void challenge10();
-void challenge11();
-void challenge12();
+static void checkError(int res, char *function);
+static void setupAndInitializeServer(int *serverFd, int *opt, struct sockaddr_in *address, int *addrlen, int *socketFd, FILE **socketFile);
+static void runChallenges(FILE *socketFile);
+static void clearScreen();
+static int isCorrectAns(char const *correctAns,char const *userAns);
+static void printHintMessage();
+static void printQMessage();
+static void challenge4();
+static void challenge6();
+static void challenge7();
+static void challenge8();
+static void challenge10();
+static void challenge11();
+static void challenge12();
 
 #define STDOUT 1
 #define STDERR 2
@@ -69,7 +67,7 @@ Challenge allChallenges[CHALLENGES] = {
     },
     {
         "too_easy\n",
-        "respuesta = strings:69\n",
+        "respuesta = strings:70\n",
         "¿Cómo garantiza TCP que los paquetes llegan en orden y no se pierden?",
         NULL
     },
@@ -129,7 +127,7 @@ int main(int argc, char const *argv[]) {
     return 0;
 }
 
-void setupAndInitializeServer(int *serverFd, int *opt, struct sockaddr_in *address, int *addrlen, int *socketFd, FILE **socketFile){
+static void setupAndInitializeServer(int *serverFd, int *opt, struct sockaddr_in *address, int *addrlen, int *socketFd, FILE **socketFile){
     checkError(*serverFd = socket(AF_INET, SOCK_STREAM, 0),"socket");
     checkError(setsockopt(*serverFd, SOL_SOCKET, SO_REUSEADDR, opt, sizeof(*opt)),"setsockopt");
 
@@ -146,7 +144,7 @@ void setupAndInitializeServer(int *serverFd, int *opt, struct sockaddr_in *addre
     }
 }
 
-void runChallenges(FILE *socketFile){
+static void runChallenges(FILE *socketFile){
     int  current = 0 ;
     char *buffer = NULL;
     size_t bufferSize = 0;
@@ -175,7 +173,7 @@ void runChallenges(FILE *socketFile){
     free(buffer);
 }
 
-void challenge4() {
+static void challenge4() {
     if(write(13, "La respuesta es fk3wfLCm3QvS\n",30) == -1)
         perror("write");
 }
@@ -184,7 +182,7 @@ __attribute__((section(".RUN_ME"))) void challenge6(){
     return;
 }
 
-void challenge7() {
+static void challenge7() {
     char *theAnsIs = "La respuesta es K5n2UFfpFMUN";
     int ansLen = strlen(theAnsIs);
     int num = randInt(LOWER, UPPER);
@@ -205,11 +203,11 @@ void challenge7() {
     putchar('\n');
 }
 
-void challenge8() {
+static void challenge8() {
     printf("\033[30;40mLa respuesta es BUmyYq5XxXGt\033[0m\n");
 }
 
-void challenge10() {
+static void challenge10() {
     if (system("gcc quine.c -o quine") != 0){
         puts("\n\nENTER para reintentar.\n");
         return;
@@ -229,11 +227,11 @@ static void gdbme(){
     }
 }
 
-void challenge11() {
+static void challenge11() {
     gdbme();
 }
 
-void challenge12() {
+static void challenge12() {
     double x, y, aux;
     int i;
     for ( i = 0; i < 1000; i++) {
@@ -245,7 +243,7 @@ void challenge12() {
     printf("\n");
 }
 
-int isCorrectAns(char const *correctAns,char const *userAns) {
+static int isCorrectAns(char const *correctAns,char const *userAns) {
     if (strcmp(correctAns,userAns)) {
         printf("\nWrong answer: %s\n",userAns);
         sleep(2);
@@ -254,32 +252,21 @@ int isCorrectAns(char const *correctAns,char const *userAns) {
     return 1;
 }
 
-void printHintMessage() {
+static void printHintMessage() {
     printf("\n------------- DESAFIO -------------\n");
 }
 
-void printQMessage() {
+static void printQMessage() {
     printf("\n----- PREGUNTA PARA INVESTIGAR -----\n");
 }
 
-void clearScreen() {
+static void clearScreen() {
     printf("\033[1;1H\033[2J");
 }
 
-void checkError(int res, char *functionName) {
+static void checkError(int res, char *functionName) {
     if (res == -1){
         perror(functionName);
         exit(-1);
     }
-}
-
-double randNormalize (void){
-	return (rand() / ( (double)RAND_MAX + 1));
-}
-int randInt(int izq, int der){
-	return (int)(randNormalize() * (der - izq + 1) + izq);
-}
-
-void randomize(void){
-	srand((int)time(NULL));
 }
