@@ -69,7 +69,7 @@ Challenge allChallenges[CHALLENGES] = {
     },
     {
         "too_easy\n",
-        "respuesta = strings:277\n",
+        "respuesta = strings:69\n",
         "¿Cómo garantiza TCP que los paquetes llegan en orden y no se pierden?",
         NULL
     },
