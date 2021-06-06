@@ -1,3 +1,3 @@
 GCC=gcc
 
-GCCFLAGS= -Wall -g -std=gnu99
+GCCFLAGS= -Wall -o -std=gnu99
