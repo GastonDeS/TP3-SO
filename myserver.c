@@ -7,12 +7,11 @@
 #include <math.h>
 #include <time.h>
 
-void checkError(int res, char *message);
+void checkError(int res, char *function);
 void setupAndInitializeServer(int *serverFd, int *opt, struct sockaddr_in *address, int *addrlen, int *socketFd, FILE **socketFile);
 void runChallenges(FILE *socketFile);
 void clearScreen();
 int isCorrectAns(char const *correctAns,char const *userAns);
-void printInitialInstructions();
 void printHintMessage();
 void printQMessage();
 void challenge4();
@@ -114,8 +113,6 @@ Challenge allChallenges[CHALLENGES] = {
     }
 };
 
-char const *start = "Bienvenidos al TP3 y felicitaciones, ya resolvieron el primer acertijo.\n\nEn este TP deberán finalizar el juego que ya comenzaron resolviendo los desafíos de cada nivel.\nAdemás tendrán que investigar otras preguntas para responder durante la defensa.\nEl desafío final consiste en crear un programa que se comporte igual que yo, es decir, que provea los mismos desafíos y que sea necesario hacer lo mismo para resolverlos. No basta con esperar la respuesta.\nAdemás, deberán implementar otro programa para comunicarse conmigo.\n\nDeberán estar atentos a los easter eggs.\n";
-
 int main(int argc, char const *argv[]) {
     int serverFd, socketFd, opt = 1;
     struct sockaddr_in address;
@@ -153,9 +150,8 @@ void runChallenges(FILE *socketFile){
     size_t bufferSize = 0;
     srand(time(0));
 
-    printInitialInstructions();
-
     while (current < CHALLENGES ) {
+        clearScreen();
         printHintMessage();
         printf("%s\n",allChallenges[current].hint);
 
@@ -248,7 +244,6 @@ int isCorrectAns(char const *correctAns,char const *userAns) {
         sleep(2);
         return 0;
     }
-    clearScreen();
     return 1;
 }
 
@@ -264,13 +259,9 @@ void clearScreen() {
     printf("\033[1;1H\033[2J");
 }
 
-void printInitialInstructions(){
-    printf("%s",start);
-}
-
-void checkError(int res, char *message) {
+void checkError(int res, char *functionName) {
     if (res == -1){
-        fprintf(stderr, "Error in function: %s",message);
+        perror(functionName);
         exit(-1);
     }
 }

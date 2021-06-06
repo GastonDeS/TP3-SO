@@ -15,9 +15,8 @@ static char *answers[40] = {
 
 int main(int argc, char **argv) {
     struct sockaddr_in serv_addr;
-    char *hello = "entendido\n";
-    char buff[1024];
     int sock ;
+
     if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_IP)) < 0) {
         printf("\n Socket creation error \n");
         return -1;
@@ -38,4 +37,6 @@ int main(int argc, char **argv) {
     int i;
     for (i=0; i < QCOUNT; i++)
         send(sock , answers[i] , strlen(answers[i]) , 0 );
+
+    return 0;
 }
