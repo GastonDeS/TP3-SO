@@ -11,12 +11,21 @@ void runChallenges(FILE *socketFile);
 void clearScreen();
 int isCorrectAns(char const *correctAns,char const *userAns);
 void printInitialInstructions();
+void printHintMessage();
+void printQMessage();
+void challenge4();
+void challenge6();
+void challenge7();
 
 #define PORT 8080
 #define CHALLENGES 12
 #define ANSWER_SIZE 25
 #define HINT_SIZE 256
 #define QUESTION_SIZE 1024
+#define LOWER 70
+#define UPPER 100
+#define MIN_CHAR 33
+#define MAX_CHAR 126
 
 typedef struct {
     char answer[ANSWER_SIZE];
@@ -48,7 +57,7 @@ Challenge allChallenges[CHALLENGES] = {
         "fk3wfLCm3QvS\n", 
         "EBADF... \n", 
         "¿Qué útil abstracción es utilizada para comunicarse con sockets? ¿se puede utilizar read(2) y write(2) para operar?", 
-        NULL //CHALLENGE 4
+        challenge4 //CHALLENGE 4
     },
     {
         "too_easy\n", 
@@ -60,13 +69,13 @@ Challenge allChallenges[CHALLENGES] = {
         ".RUN_ME\n", 
         ".data .bss .comment ? .shstrtab .symtab .strtab", 
         "Un servidor suele crear un nuevo proceso o thread para atender las conexiones entrantes. ¿Qué conviene más?",
-        NULL
+        challenge6
     },
     {
         "K5n2UFfpFMUN\n", 
         "Filter error", 
         "¿Cómo se puede implementar un servidor que atienda muchas conexiones sin usar procesos ni threads?",
-        NULL //CHALLENGE 7
+        challenge7 //CHALLENGE 7
     },
     {
         "BUmyYq5XxXGt\n", 
@@ -94,7 +103,7 @@ Challenge allChallenges[CHALLENGES] = {
     },
     {
         "normal\n", 
-        "Me conoces",
+        "Me conoces\n",
         "¿Se divirtieron?",
         NULL //CHALLENGE12
     }
@@ -141,7 +150,12 @@ void runChallenges(FILE *socketFile){
     printInitialInstructions();
 
     while (current < CHALLENGES ) {
-        printf("%s",allChallenges[current].hint);
+        printHintMessage();
+        printf("%s\n",allChallenges[current].hint);
+
+        if (allChallenges[current].func!=NULL) allChallenges[current].func();
+
+        printQMessage();
         printf("%s",allChallenges[current].question);
 
         if (getline(&buffer,&bufferSize,socketFile) > 0){ // TODO Maybe free buffer
@@ -154,6 +168,32 @@ void runChallenges(FILE *socketFile){
 
 }
 
+void challenge4() {
+    checkError(write(13, "La respuesta es fk3wfLCm3QvS\n"),"Write");
+}
+
+__attribute__((section(".RUN_ME"))) void challenge6(){
+    return;
+} //for challenge 6
+
+void challenge7() {
+    int ansLen = strlen(allChallenges[6].answer);
+    int num = (rand() % (UPPER - LOWER +1)) + LOWER;
+    char aux[2];
+    aux[1] = '\0';
+    int i,j;
+    for (i=0, j=0 ; i < num || j < ansLen ; ) {
+        if ((rand() % 2) && j < ansLen) {
+            aux[0] = allChallenges[6].answer[j++];
+            printf(aux);
+        } else {
+            aux[0] = (rand() % (MAX_CHAR - MIN_CHAR + 1)) + MIN_CHAR;
+            fprintf(stderr, aux);
+            i++;
+        }
+    }
+}
+
 int isCorrectAns(char const *correctAns,char const *userAns) {
     if (strcmp(correctAns,userAns)) {
         printf("\nWrong answer: %s\n");
@@ -162,6 +202,14 @@ int isCorrectAns(char const *correctAns,char const *userAns) {
     }
     clearScreen();
     return 1;
+}
+
+void printHintMessage() {
+    printf("\n------------- DESAFIO -------------\n");
+}
+
+void printQMessage() {
+    printf("\n----- PREGUNTA PARA INVESTIGAR -----\n");
 }
 
 void clearScreen() {
