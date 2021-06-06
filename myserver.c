@@ -14,6 +14,8 @@ void clearScreen();
 int isCorrectAns(char const *correctAns,char const *userAns);
 void printHintMessage();
 void printQMessage();
+int randInt(int izq, int der);
+void randomize(void);
 void challenge4();
 void challenge6();
 void challenge7();
@@ -120,9 +122,7 @@ int main(int argc, char const *argv[]) {
     FILE *socketFile;
 
     setupAndInitializeServer(&serverFd, &opt, &address, &addrlen, &socketFd, &socketFile);
-
     runChallenges(socketFile);
-
 
     return 0;
 }
@@ -148,7 +148,7 @@ void runChallenges(FILE *socketFile){
     int  current = 0 ;
     char *buffer = NULL;
     size_t bufferSize = 0;
-    srand(time(0));
+    randomize();
 
     while (current < CHALLENGES ) {
         clearScreen();
@@ -160,14 +160,14 @@ void runChallenges(FILE *socketFile){
         printQMessage();
         printf("%s\n\n",allChallenges[current].question);
 
-        if (getline(&buffer,&bufferSize,socketFile) > 0){ // TODO Maybe free buffer
+        if (getline(&buffer,&bufferSize,socketFile) > 0){
             current += isCorrectAns(allChallenges[current].answer,buffer);
         } else
             return;
     }
 
     printf("Felicitaciones, finalizaron el juego. Ahora deberán implementar el servidor que se comporte como el servidor provisto\n\n");
-
+    free(buffer);
 }
 
 void challenge4() {
@@ -179,20 +179,20 @@ __attribute__((section(".RUN_ME"))) void challenge6(){
     return;
 }
 
-void challenge7() { //TODO FIX THIS ONE
+void challenge7() { 
     char *theAnsIs = "La respuesta es K5n2UFfpFMUN";
     int ansLen = strlen(theAnsIs);
-    int num = (rand() % (UPPER - LOWER +1)) + LOWER;
+    int num = randInt(LOWER, UPPER);
     char aux[2];
     aux[1] = '\0';
     int i,j;
     for (i=0, j=0 ; i < num || j < ansLen ; ) {
-        if ((rand() % 2) && j < ansLen) {
+        if (randInt(0,1) && j < ansLen) {
             aux[0] = theAnsIs[j++];
-            printf(aux);
+            write(STDOUT, aux, 1);
         } else {
-            aux[0] = (rand() % (MAX_CHAR - MIN_CHAR + 1)) + MIN_CHAR;
-            fprintf(stderr, aux);
+            aux[0] = randInt(MIN_CHAR, MAX_CHAR);
+            write(STDERR, aux, 1);
             i++;
         }
     }
@@ -264,4 +264,15 @@ void checkError(int res, char *functionName) {
         perror(functionName);
         exit(-1);
     }
+}
+
+double randNormalize (void){
+	return (rand() / ( (double)RAND_MAX + 1));
+}
+int randInt(int izq, int der){
+	return (int)(randNormalize() * (der - izq + 1) + izq);
+}
+
+void randomize(void){
+	srand((int)time(NULL));
 }
