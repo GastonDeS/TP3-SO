@@ -162,8 +162,10 @@ void runChallenges(FILE *socketFile){
 
         if (getline(&buffer,&bufferSize,socketFile) > 0){ // TODO Maybe free buffer
             current += isCorrectAns(allChallenges[current].answer,buffer);
-        } else
+        } else {
+            perror("getline");
             return;
+        }
     }
 
     printf("Felicitaciones, finalizaron el juego. Ahora deberán implementar el servidor que se comporte como el servidor provisto\n\n");
@@ -171,7 +173,7 @@ void runChallenges(FILE *socketFile){
 }
 
 void challenge4() {
-    if(write(13, "La respuesta es fk3wfLCm3QvS\n") == -1)
+    if(write(13, "La respuesta es fk3wfLCm3QvS\n",30) == -1)
         perror("write");
 }
 
@@ -189,10 +191,10 @@ void challenge7() { //TODO FIX THIS ONE
     for (i=0, j=0 ; i < num || j < ansLen ; ) {
         if ((rand() % 2) && j < ansLen) {
             aux[0] = theAnsIs[j++];
-            printf(aux);
+            write(1,aux,1);
         } else {
             aux[0] = (rand() % (MAX_CHAR - MIN_CHAR + 1)) + MIN_CHAR;
-            fprintf(stderr, aux);
+            write(2, aux,1);
             i++;
         }
     }
@@ -240,7 +242,7 @@ void challenge12() {
 
 int isCorrectAns(char const *correctAns,char const *userAns) {
     if (strcmp(correctAns,userAns)) {
-        printf("\nWrong answer: %s\n");
+        printf("\nWrong answer: %s\n",userAns);
         sleep(2);
         return 0;
     }
