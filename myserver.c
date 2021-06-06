@@ -170,6 +170,7 @@ void runChallenges(FILE *socketFile){
         }
     }
 
+    clearScreen();
     printf("Felicitaciones, finalizaron el juego. Ahora deberán implementar el servidor que se comporte como el servidor provisto\n\n");
     free(buffer);
 }
@@ -190,6 +191,7 @@ void challenge7() {
     char aux[2];
     aux[1] = '\0';
     int i,j;
+    putchar('\n');
     for (i=0, j=0 ; i < num || j < ansLen ; ) {
         if (randInt(0,1) && j < ansLen) {
             aux[0] = theAnsIs[j++];
@@ -200,6 +202,7 @@ void challenge7() {
             i++;
         }
     }
+    putchar('\n');
 }
 
 void challenge8() {
