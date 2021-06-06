@@ -6,6 +6,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+#include <unistd.h>
 
 void checkError(int res, char *function);
 void setupAndInitializeServer(int *serverFd, int *opt, struct sockaddr_in *address, int *addrlen, int *socketFd, FILE **socketFile);
@@ -24,7 +25,8 @@ void challenge10();
 void challenge11();
 void challenge12();
 
-
+#define STDOUT 1
+#define STDERR 2
 #define PORT 8080
 #define CHALLENGES 12
 #define LOWER 70
