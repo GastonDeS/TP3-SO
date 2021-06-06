@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <math.h>
+#include <time.h>
 
 void checkError(int res, char *message);
 void setupAndInitializeServer(int *serverFd, int *opt, struct sockaddr_in *address, int *addrlen, int *socketFd, FILE **socketFile);
@@ -16,34 +18,37 @@ void printQMessage();
 void challenge4();
 void challenge6();
 void challenge7();
+void challenge8();
+void challenge10();
+void challenge11();
+void challenge12();
+
 
 #define PORT 8080
 #define CHALLENGES 12
-#define ANSWER_SIZE 25
-#define HINT_SIZE 256
-#define QUESTION_SIZE 1024
 #define LOWER 70
 #define UPPER 100
 #define MIN_CHAR 33
 #define MAX_CHAR 126
+#define PI 3.14159265358979323846
 
 typedef struct {
-    char answer[ANSWER_SIZE];
-    char hint[HINT_SIZE];
-    char question[QUESTION_SIZE];
+    char *answer;
+    char *hint;
+    char *question;
     void (*func)(void);
 }Challenge;
 
 Challenge allChallenges[CHALLENGES] = {
     {
         "entendido\n",
-        "Para verificar que sus respuestas tienen el formato correcto respondan a este desafío con la palabra 'entendido\\\n'", 
+        "Bienvenidos al TP3 y felicitaciones, ya resolvieron el primer acertijo.\n\nEn este TP deberán finalizar el juego que ya comenzaron resolviendo los desafíos de cada nivel.\nAdemás tendrán que investigar otras preguntas para responder durante la defensa.\nEl desafío final consiste en crear un programa que se comporte igual que yo, es decir, que provea los mismos desafíos y que sea necesario hacer lo mismo para resolverlos. No basta con esperar la respuesta.\nAdemás, deberán implementar otro programa para comunicarse conmigo.\n\nDeberán estar atentos a los easter eggs.\nPara verificar que sus respuestas tienen el formato correcto respondan a este desafío con la palabra 'entendido\\n'", 
         "¿Cómo descubrieron el protocolo, la dirección y el puerto para conectarse?",
         NULL
     },
     {
         "itba\n",
-        "The Wire S1E5 5295 888 6288", 
+        "The Wire S1E5\n5295 888 6288", 
         "¿Qué diferencias hay entre TCP y UDP y en qué casos conviene usar cada uno?",
         NULL
     },
@@ -57,11 +62,11 @@ Challenge allChallenges[CHALLENGES] = {
         "fk3wfLCm3QvS\n", 
         "EBADF... \n", 
         "¿Qué útil abstracción es utilizada para comunicarse con sockets? ¿se puede utilizar read(2) y write(2) para operar?", 
-        challenge4 //CHALLENGE 4
+        challenge4
     },
     {
         "too_easy\n", 
-        "respuesta = strings:277", 
+        "respuesta = strings:277\n", 
         "¿Cómo garantiza TCP que los paquetes llegan en orden y no se pierden?",
         NULL
     },
@@ -75,17 +80,17 @@ Challenge allChallenges[CHALLENGES] = {
         "K5n2UFfpFMUN\n", 
         "Filter error", 
         "¿Cómo se puede implementar un servidor que atienda muchas conexiones sin usar procesos ni threads?",
-        challenge7 //CHALLENGE 7
+        challenge7
     },
     {
         "BUmyYq5XxXGt\n", 
         "¿? \n", 
         "¿Qué aplicaciones se pueden utilizar para ver el tráfico por la red?",
-        NULL
+        challenge8
     },
     {
         "u^v\n",
-        "Latexme\n\nSi\n\\mathrm{d}y = u^v{\\cdot}(v'{\\cdot}\\ln{(u)}+v{\\cdot}\\frac{u'}{u})\nentonces\ny = ", 
+        "Latexme\n\nSi\n \\mathrm{d}y = u^v{\\cdot}(v'{\\cdot}\\ln{(u)}+v{\\cdot}\\frac{u'}{u})\nentonces\ny = ", 
         "Sockets es un mecanismo de IPC. ¿Qué es más eficiente entre sockets y pipes?",
         NULL
     },
@@ -93,23 +98,23 @@ Challenge allChallenges[CHALLENGES] = {
         "chin_chu_lan_cha\n", 
         "quine\n", 
         "¿Cuáles son las características del protocolo SCTP?",
-        NULL //CHALLENGE10
+        challenge10
     },
     {
         "gdb_rules\n", 
         "b gdbme y encontrá el valor mágico\n", 
         "¿Qué es un RFC?",
-        NULL //CHALLENGE11
+        challenge11
     },
     {
         "normal\n", 
         "Me conoces\n",
-        "¿Se divirtieron?",
-        NULL //CHALLENGE12
+        "¿Fue divertido?",
+        challenge12
     }
 };
 
-char const *start = "Bienvenidos al TP3 y felicitaciones, ya resolvieron el primer acertijo.\nEn este TP deberán finalizar el juego que ya comenzaron resolviendo los desafíos de cada nivel.\nAdemás tendrán que investigar otras preguntas para responder durante la defensa.\nEl desafío final consiste en crear un programa que se comporte igual que yo, es decir, que provea los mismos desafíos y que sea necesario hacer lo mismo para resolverlos. No basta con esperar la respuesta.\nAdemás, deberán implementar otro programa para comunicarse conmigo.\nDeberán estar atentos a los easter eggs.\n";
+char const *start = "Bienvenidos al TP3 y felicitaciones, ya resolvieron el primer acertijo.\n\nEn este TP deberán finalizar el juego que ya comenzaron resolviendo los desafíos de cada nivel.\nAdemás tendrán que investigar otras preguntas para responder durante la defensa.\nEl desafío final consiste en crear un programa que se comporte igual que yo, es decir, que provea los mismos desafíos y que sea necesario hacer lo mismo para resolverlos. No basta con esperar la respuesta.\nAdemás, deberán implementar otro programa para comunicarse conmigo.\n\nDeberán estar atentos a los easter eggs.\n";
 
 int main(int argc, char const *argv[]) {
     int serverFd, socketFd, opt = 1;
@@ -146,6 +151,7 @@ void runChallenges(FILE *socketFile){
     int  current = 0 ;
     char *buffer = NULL;
     size_t bufferSize = 0;
+    srand(time(0));
 
     printInitialInstructions();
 
@@ -156,35 +162,37 @@ void runChallenges(FILE *socketFile){
         if (allChallenges[current].func!=NULL) allChallenges[current].func();
 
         printQMessage();
-        printf("%s",allChallenges[current].question);
+        printf("%s\n\n",allChallenges[current].question);
 
         if (getline(&buffer,&bufferSize,socketFile) > 0){ // TODO Maybe free buffer
-            current += isCorrectAns("hola","hola");
+            current += isCorrectAns(allChallenges[current].answer,buffer);
         } else
             return;
     }
 
-    printf("Felicitaciones, finalizaron el juego. Ahora deberán implementar el servidor que se comporte como el servidor provisto\n");
+    printf("Felicitaciones, finalizaron el juego. Ahora deberán implementar el servidor que se comporte como el servidor provisto\n\n");
 
 }
 
 void challenge4() {
-    checkError(write(13, "La respuesta es fk3wfLCm3QvS\n"),"Write");
+    if(write(13, "La respuesta es fk3wfLCm3QvS\n") == -1)
+        perror("write");
 }
 
 __attribute__((section(".RUN_ME"))) void challenge6(){
     return;
-} //for challenge 6
+}
 
-void challenge7() {
-    int ansLen = strlen(allChallenges[6].answer);
+void challenge7() { //TODO FIX THIS ONE
+    char *theAnsIs = "La respuesta es K5n2UFfpFMUN";
+    int ansLen = strlen(theAnsIs);
     int num = (rand() % (UPPER - LOWER +1)) + LOWER;
     char aux[2];
     aux[1] = '\0';
     int i,j;
     for (i=0, j=0 ; i < num || j < ansLen ; ) {
         if ((rand() % 2) && j < ansLen) {
-            aux[0] = allChallenges[6].answer[j++];
+            aux[0] = theAnsIs[j++];
             printf(aux);
         } else {
             aux[0] = (rand() % (MAX_CHAR - MIN_CHAR + 1)) + MIN_CHAR;
@@ -192,6 +200,46 @@ void challenge7() {
             i++;
         }
     }
+}
+
+void challenge8() {
+    printf("\033[30;40mLa respuesta es BUmyYq5XxXGt\033[0m\n");
+}
+
+void challenge10() {
+    if (system("gcc quine.c -o quine") != 0){
+        puts("\n\nENTER para reintentar.\n");
+        return;
+    }
+    puts("¡Genial!, ya lograron meter un programa en quine.c, veamos si hace lo que corresponde.");
+
+    if (system("./quine | diff - quine.c") != 0) {
+        printf("\n%s\n", "diff encontró diferencias.");
+        puts("\n\nENTER para reintentar.\n");
+    } else
+        printf("La respuesta es chin_chu_lan_cha");
+}
+
+static void gdbme(){
+    long long pid  = getpid();
+    if (pid == 0x123456789)
+        printf("la respuesta es gdb_rules");
+}
+
+void challenge11() {
+    gdbme();
+}
+
+void challenge12() {
+    double x, y, aux;
+    int i;
+    for ( i = 0; i < 1000; i++) {
+        x = rand() / ((double)RAND_MAX + 1);
+        y = rand() / ((double)RAND_MAX + 1);
+        aux = sqrt(-2 * log(x)) * cos(2 * PI * y);
+        printf("%.6f ", aux);
+    }
+    printf("\n");
 }
 
 int isCorrectAns(char const *correctAns,char const *userAns) {
