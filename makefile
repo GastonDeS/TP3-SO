@@ -1,4 +1,4 @@
-include Makefile.inc
+include makefile.inc
 
 SOURCES_CLIENT := $(wildcard cliente/*.c)
 SOURCES_SERVER := $(wildcard serve/*.c)
