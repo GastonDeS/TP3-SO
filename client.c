@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     }
 
     int i;
-    for (i=0; i < 6; i++)
+    for (i=0; i < QCOUNT; i++)
         send(sock , answers[i] , strlen(answers[i]) , 0 );
 
     return 0;

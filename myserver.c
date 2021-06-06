@@ -29,8 +29,8 @@ void challenge12();
 #define STDERR 2
 #define PORT 8080
 #define CHALLENGES 12
-#define LOWER 70
-#define UPPER 100
+#define LOWER 150
+#define UPPER 220
 #define MIN_CHAR 33
 #define MAX_CHAR 126
 #define PI 3.14159265358979323846
@@ -221,9 +221,9 @@ void challenge10() {
 }
 
 static void gdbme(){
-    long long pid  = getpid();
-    if (pid == 0x123456789)
-        printf("la respuesta es gdb_rules");
+    if (getpid() == 0x12345678) {
+        printf("La respuesta es gdb_rules\n");
+    }
 }
 
 void challenge11() {
