@@ -17,7 +17,7 @@ static char *answers[] = {
 
 int main(int argc, char **argv) {
     struct sockaddr_in serv_addr;
-    int sockFd = 0, serverFd ;
+    int sockFd = 0 ;
 
     if ((sockFd = socket(PF_INET, SOCK_STREAM, IPPROTO_IP)) < 0) {
         printf("\n Socket creation error \n");
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
         printf("\nInvalid address/ Address not supported \n");
         return -1;
     }
-    if ((serverFd = connect(sockFd, (struct sockaddr *)&serv_addr, sizeof(serv_addr))) < 0) {
+    if (( connect(sockFd, (struct sockaddr *)&serv_addr, sizeof(serv_addr))) < 0) {
         printf("\nConnection Failed \n");
         return -1;
     }
@@ -44,6 +44,5 @@ int main(int argc, char **argv) {
         }
 
     close(sockFd);
-    close(serverFd);
     return 0;
 }
