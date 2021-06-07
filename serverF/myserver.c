@@ -68,13 +68,13 @@ static Challenge allChallenges[CHALLENGES] = {
     },
     {
         "too_easy\n",
-        "respuesta = strings:104\n",
+        "respuesta = strings:105 \n",
         "¿Cómo garantiza TCP que los paquetes llegan en orden y no se pierden?",
         NULL
     },
     {
         ".RUN_ME\n",
-        ".data .bss .comment ? .shstrtab .symtab .strtab",
+        ".rela.plt .init .text ? .fini .rodata .eh_frame_hdr",
         "Un servidor suele crear un nuevo proceso o thread para atender las conexiones entrantes. ¿Qué conviene más?",
         NULL
     },
