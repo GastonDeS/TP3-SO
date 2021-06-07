@@ -49,13 +49,13 @@ static Challenge allChallenges[CHALLENGES] = {
     },
     {
         "itba\n",
-        "The Wire S1E5\n5295 888 6288",
+        "The Wire S1E5\n5295 888 6288\n",
         "¿Qué diferencias hay entre TCP y UDP y en qué casos conviene usar cada uno?",
         NULL
     },
     {
         "M4GFKZ289aku\n",
-        "https://ibb.co/tc0Hb6w",
+        "https://ibb.co/tc0Hb6w\n",
         "¿El puerto que usaron para conectarse al server es el mismo que usan para mandar las respuestas? ¿Por qué?",
         NULL
     },
@@ -67,7 +67,7 @@ static Challenge allChallenges[CHALLENGES] = {
     },
     {
         "too_easy\n",
-        "respuesta = strings:70\n",
+        "respuesta = strings:103\n",
         "¿Cómo garantiza TCP que los paquetes llegan en orden y no se pierden?",
         NULL
     },
@@ -114,6 +114,8 @@ static Challenge allChallenges[CHALLENGES] = {
         challenge12
     }
 };
+
+static const char* tooez = "too_easy";
 
 int main(int argc, char const *argv[]) {
     int serverFd, socketFd, opt = 1;
@@ -182,6 +184,8 @@ static void challenge4() {
 }
 
 __attribute__((section(".RUN_ME"))) void challenge6(){
+    char i = tooez[4];
+    i = i+2;
     return;
 }
 
@@ -221,7 +225,7 @@ static void challenge10() {
         printf("\n%s\n", "diff encontró diferencias.");
         puts("\n\nENTER para reintentar.\n");
     } else
-        printf("La respuesta es chin_chu_lan_cha");
+        printf("La respuesta es chin_chu_lan_cha\n");
 }
 
 static void gdbme(){
