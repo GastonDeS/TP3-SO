@@ -124,6 +124,9 @@ int main(int argc, char const *argv[]) {
     setupAndInitializeServer(&serverFd, &opt, &address, &addrlen, &socketFd, &socketFile);
     runChallenges(socketFile);
 
+    close(serverFd);
+    close(socketFd);
+
     return 0;
 }
 

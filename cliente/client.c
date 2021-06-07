@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #define PORT 8080
-#define QCOUNT 12
+#define CCOUNT 12
 
 static char *answers[40] = {
     "entendido\n","itba\n","M4GFKZ289aku\n",
@@ -15,9 +15,9 @@ static char *answers[40] = {
 
 int main(int argc, char **argv) {
     struct sockaddr_in serv_addr;
-    int sock ;
+    int sockFd = 0, serverFd ;
 
-    if ((sock = socket(PF_INET, SOCK_STREAM, IPPROTO_IP)) < 0) {
+    if ((sockFd = socket(PF_INET, SOCK_STREAM, IPPROTO_IP)) < 0) {
         printf("\n Socket creation error \n");
         return -1;
     }
@@ -25,18 +25,20 @@ int main(int argc, char **argv) {
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(PORT);
 
-    if(inet_pton(AF_INET, "0.0.0.0", &serv_addr.sin_addr)<=0) {
+    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0) {
         printf("\nInvalid address/ Address not supported \n");
         return -1;
     }
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+    if ((serverFd = connect(sockFd, (struct sockaddr *)&serv_addr, sizeof(serv_addr))) < 0) {
         printf("\nConnection Failed \n");
         return -1;
     }
 
     int i;
-    for (i=0; i < QCOUNT; i++)
-        send(sock , answers[i] , strlen(answers[i]) , 0 );
+    for (i=0; i < CCOUNT; i++)
+        send(sockFd , answers[i] , strlen(answers[i]) , 0 );
 
+    close(sockFd);
+    close(serverFd);
     return 0;
 }
