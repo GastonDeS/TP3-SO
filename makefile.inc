@@ -1,3 +1,3 @@
 GCC=gcc
 
-GCCFLAGS= -Wall -o -std=gnu99
+GCCFLAGS= -Wall -std=gnu99 -Wno-unused-variable

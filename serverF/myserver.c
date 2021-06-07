@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <sys/socket.h>
 #include <stdio.h>
 #include <netinet/in.h>
@@ -16,7 +18,6 @@ static int isCorrectAns(char const *correctAns,char const *userAns);
 static void printHintMessage();
 static void printQMessage();
 static void challenge4();
-static void challenge6();
 static void challenge7();
 static void challenge8();
 static void challenge10();
@@ -27,7 +28,7 @@ static void challenge12();
 #define STDERR 2
 #define PORT 8080
 #define CHALLENGES 12
-#define LOWER 150
+#define LOWER 180
 #define UPPER 220
 #define MIN_CHAR 33
 #define MAX_CHAR 126
@@ -67,7 +68,7 @@ static Challenge allChallenges[CHALLENGES] = {
     },
     {
         "too_easy\n",
-        "respuesta = strings:103\n",
+        "respuesta = strings:104\n",
         "¿Cómo garantiza TCP que los paquetes llegan en orden y no se pierden?",
         NULL
     },
@@ -75,7 +76,7 @@ static Challenge allChallenges[CHALLENGES] = {
         ".RUN_ME\n",
         ".data .bss .comment ? .shstrtab .symtab .strtab",
         "Un servidor suele crear un nuevo proceso o thread para atender las conexiones entrantes. ¿Qué conviene más?",
-        challenge6
+        NULL
     },
     {
         "K5n2UFfpFMUN\n",
@@ -115,7 +116,23 @@ static Challenge allChallenges[CHALLENGES] = {
     }
 };
 
+
+//data hidden in binary
 static const char* tooez = "too_easy";
+
+static const char* easter_egg =  
+"_______________________\n"
+"< ESTO ES UN EASTER_EGG >\n"
+ "-----------------------\n"
+    "    \\   ^__^\n"
+    "    \\  (oo)\\_______\n"
+    "        (__)\\       )\\/\\\n"
+    "           ||----w |\n"
+    "           ||     ||\n";
+
+void foo() __attribute__((section(".RUN_ME")));
+
+void foo() {return;};
 
 int main(int argc, char const *argv[]) {
     int serverFd, socketFd, opt = 1;
@@ -126,6 +143,7 @@ int main(int argc, char const *argv[]) {
     setupAndInitializeServer(&serverFd, &opt, &address, &addrlen, &socketFd, &socketFile);
     runChallenges(socketFile);
 
+    fclose(socketFile);
     close(serverFd);
     close(socketFd);
 
@@ -183,12 +201,6 @@ static void challenge4() {
         perror("write");
 }
 
-__attribute__((section(".RUN_ME"))) void challenge6(){
-    char i = tooez[4];
-    i = i+2;
-    return;
-}
-
 static void challenge7() {
     char *theAnsIs = "La respuesta es K5n2UFfpFMUN";
     int ansLen = strlen(theAnsIs);
@@ -198,7 +210,7 @@ static void challenge7() {
     int i,j;
     putchar('\n');
     for (i=0, j=0 ; i < num || j < ansLen ; ) {
-        if (randInt(0,1) && j < ansLen) {
+        if (randInt(0, 4) == 0 && j < ansLen) {
             aux[0] = theAnsIs[j++];
             write(STDOUT, aux, 1);
         } else {
@@ -251,7 +263,7 @@ static void challenge12() {
 }
 
 static int isCorrectAns(char const *correctAns,char const *userAns) {
-    if (strcmp(correctAns,userAns)) {
+    if (strcmp(correctAns,userAns)!=0) {
         printf("\nWrong answer: %s\n",userAns);
         sleep(2);
         return 0;
