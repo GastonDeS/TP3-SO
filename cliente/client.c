@@ -38,7 +38,10 @@ int main(int argc, char **argv) {
 
     int i;
     for (i=0; answers[i] ; i++)
-        send(sockFd , answers[i] , strlen(answers[i]) , 0 );
+        if (send(sockFd , answers[i] , strlen(answers[i]) , 0 ) == -1) {
+            perror("send");
+            return -1;
+        }
 
     close(sockFd);
     close(serverFd);
