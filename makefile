@@ -1,7 +1,7 @@
 include makefile.inc
 
 SOURCES_CLIENT := $(wildcard cliente/*.c)
-SOURCES_SERVER := $(wildcard serve/*.c)
+SOURCES_SERVER := $(wildcard serverF/*.c)
 
 all: client server
 
@@ -15,6 +15,6 @@ server:
 
 clean:
 	@echo "Deleting objects"
-	@rm -rf server quine client ./serve/*.o
+	@rm -rf server quine client ./server/*.o
 
 .PHONY: all clean server client
