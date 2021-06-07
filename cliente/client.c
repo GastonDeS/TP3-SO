@@ -9,11 +9,11 @@
 #define PORT 8080
 #define CCOUNT 12
 
-static char *answers[40] = {
+static char *answers[] = {
     "entendido\n","itba\n","M4GFKZ289aku\n",
     "fk3wfLCm3QvS\n","too_easy\n",".RUN_ME\n",
     "K5n2UFfpFMUN\n","BUmyYq5XxXGt\n","u^v\n",
-    "chin_chu_lan_cha\n","gdb_rules\n","normal\n"}; 
+    "chin_chu_lan_cha\n","gdb_rules\n","normal\n",NULL}; 
 
 int main(int argc, char **argv) {
     struct sockaddr_in serv_addr;
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     }
 
     int i;
-    for (i=0; i < CCOUNT; i++)
+    for (i=0; answers[i] ; i++)
         send(sockFd , answers[i] , strlen(answers[i]) , 0 );
 
     close(sockFd);
